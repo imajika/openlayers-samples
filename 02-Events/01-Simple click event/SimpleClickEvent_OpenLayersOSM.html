@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple click event</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script>
+function initialize() {
+  var map = new OpenLayers.Map("map-canvas");
+  var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
+  map.addLayer(osmLayer);
+  var center = new OpenLayers.LonLat(131.044922, -25.363882)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  map.setCenter(center, 4);
+
+  var markersLayer = new OpenLayers.Layer.Markers("Markers");
+  map.addLayer(markersLayer);
+  var marker = new OpenLayers.Marker(map.getCenter());
+  markersLayer.addMarker(marker);
+  var prevLonLat = map.getCenter();
+
+  map.events.register('moveend', this, function() {
+    // 3 seconds after the center of the map has changed, pan back to the
+    // marker.
+    if (!map.getCenter().equals(marker.lonlat)) {
+      window.setTimeout(function() {
+        map.panTo(marker.lonlat);
+      }, 3000);
+    }
+  });
+
+  marker.events.register('click', this, function() {
+    map.setCenter(marker.lonlat, 8);
+  });
+}
+    </script>
+  </head>
+  <body onload="initialize();">
+    <div id="map-canvas"></div>
+  </body>
+</html>

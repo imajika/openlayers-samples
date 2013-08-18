@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html dir="rtl">
+  <head>
+    <title>Right-to-Left Languages</title>
+    <meta charset="utf-8">
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script>
+function initialize() {
+  var map = new OpenLayers.Map("map-canvas");
+  var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
+  map.addLayer(osmLayer);
+  var center = new OpenLayers.LonLat(31.249509, 30.064742)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  map.setCenter(center, 10);
+  map.addControl(new OpenLayers.Control.Scale());
+
+  var markersLayer = new OpenLayers.Layer.Markers("Markers");
+  map.addLayer(markersLayer);
+  var marker = new OpenLayers.Marker(map.getCenter());
+  markersLayer.addMarker(marker);
+
+  var infowindow = new OpenLayers.Popup.FramedCloud(
+    "infowindow", map.getCenter(), null,
+    '<div align="right"><b>القاهرة</b></div>', null, true, null);
+  infowindow.calculateRelativePosition = function () {
+    return 'tr';    // top & right
+  };
+  infowindow.hide();
+  map.addPopup(infowindow);
+
+  marker.events.register('click', this, function(e) {
+    // infowindow.moveTo(marker.lonlat);
+    infowindow.lonlat = marker.lonlat;
+    infowindow.show();
+  });
+}
+    </script>
+  </head>
+  <body onload="initialize();">
+    <div id="map-canvas"></div>
+  </body>
+</html>

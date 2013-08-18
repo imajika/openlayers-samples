@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+    </style>
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script>
+// Enable the visual refresh
+google.maps.visualRefresh = true;
+
+var map;
+function initialize() {
+   map = new OpenLayers.Map("map-canvas");
+  var gmapLayer = new OpenLayers.Layer.Google(
+    "GoogleMaps RoadMap", {
+      type: google.maps.MapTypeId.ROADMAP,
+    }
+  );
+  map.addLayer(gmapLayer);
+  var center = new OpenLayers.LonLat(150.644, -34.397)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  map.setCenter(center, 8);
+}
+    </script>
+  </head>
+  <body onload="initialize();">
+    <div id="map-canvas"></div>
+  </body>
+</html>

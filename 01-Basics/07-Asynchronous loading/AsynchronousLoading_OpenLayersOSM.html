@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Asynchronous Loading</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <script>
+function initialize() {
+  var map = new OpenLayers.Map("map-canvas");
+  var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
+  map.addLayer(osmLayer);
+  var center = new OpenLayers.LonLat(150.644, -34.397)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  map.setCenter(center, 8);
+}
+
+var initialized = false;
+function loadScript() {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = 'http://www.openlayers.org/api/OpenLayers.js';
+  script.onload = function() {
+    if (!initialized) {
+      initialized = true;
+      initialize();
+    }
+  };
+  script.onreadystatechange = function() {	// for IE
+    if (script.readyState == 'loaded' || script.readyState == 'complete') {
+      script.onload();
+    }
+  };
+  document.body.appendChild(script);
+}
+
+window.onload = loadScript;
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
+</html>

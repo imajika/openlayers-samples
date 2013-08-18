@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <!--
+    Include the maps javascript with sensor=true because this code is using a
+    sensor (a GPS locator) to determine the user's location.
+    See: https://developers.google.com/apis/maps/documentation/javascript/basics#SpecifyingSensor
+    -->
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+
+    <script>
+var map;
+
+function initialize() {
+  map = new OpenLayers.Map("map-canvas");
+  var gmapLayer = new OpenLayers.Layer.Google(
+    "GoogleMaps RoadMap", {
+      type: google.maps.MapTypeId.ROADMAP,
+    }
+  );
+  map.addLayer(gmapLayer);
+  map.zoomTo(6);
+
+  // Try HTML5 geolocation
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = new OpenLayers.LonLat(position.coords.longitude,
+                                      position.coords.latitude)
+                .transform(
+                  new OpenLayers.Projection("EPSG:4326"),     // WGS84
+                  map.getProjectionObject()
+                );
+
+      var infowindow = new OpenLayers.Popup.FramedCloud(
+        "infowindow", pos, null, 'Location found using HTML5.', null, true, null);
+      infowindow.calculateRelativePosition = function () {
+        return 'tr';    // top & right
+      };
+      map.addPopup(infowindow);
+      infowindow.show();
+      map.setCenter(pos);
+    }, function() {
+      handleNoGeolocation(true);
+    });
+  } else {
+    // Browser doesn't support Geolocation
+    handleNoGeolocation(false);
+  }
+}
+
+function handleNoGeolocation(errorFlag) {
+  if (errorFlag) {
+    var content = 'Error: The Geolocation service failed.';
+  } else {
+    var content = 'Error: Your browser doesn\'t support geolocation.';
+  }
+
+  var pos = new OpenLayers.LonLat(105, 60)
+            .transform(
+              new OpenLayers.Projection("EPSG:4326"),     // WGS84
+              map.getProjectionObject()
+            );
+  var infowindow = new OpenLayers.Popup.FramedCloud(
+    "infowindow", pos, null, content, null, true, null);
+  infowindow.calculateRelativePosition = function () {
+    return 'tr';    // top & right
+  };
+  map.addPopup(infowindow);
+  infowindow.show();
+  map.setCenter(pos);
+}
+    </script>
+  </head>
+  <body onload="initialize();">
+    <div id="map-canvas"></div>
+  </body>
+</html>

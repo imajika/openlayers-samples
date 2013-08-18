@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Localizing the Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script>
+function initialize() {
+  var map = new OpenLayers.Map("map-canvas");
+  var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
+  map.addLayer(osmLayer);
+  var center = new OpenLayers.LonLat(150.644, -34.397)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  map.setCenter(center, 8);
+}
+    </script>
+  </head>
+  <body onload="initialize();">
+    <div id="map-canvas"></div>
+  </body>
+</html>

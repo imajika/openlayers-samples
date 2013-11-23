@@ -1,47 +1,48 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html>
   <head>
-    <title>Right-to-Left Languages</title>
+    <title>Accessing arguments in UI events</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
     <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
     <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script>
 function initialize() {
-  map = new OpenLayers.Map("map-canvas");
+  var map = new OpenLayers.Map("map-canvas");
   var gmapLayer = new OpenLayers.Layer.Google(
     "GoogleMaps RoadMap", {
       type: google.maps.MapTypeId.ROADMAP,
     }
   );
   map.addLayer(gmapLayer);
-  var center = new OpenLayers.LonLat(31.249509, 30.064742)
+  var center = new OpenLayers.LonLat(131.044922, -25.363882)
     .transform(
       new OpenLayers.Projection("EPSG:4326"),     // WGS84
       map.getProjectionObject()
     );
-  map.setCenter(center, 10);
-  map.addControl(new OpenLayers.Control.Scale());
+  map.setCenter(center, 4);
 
   var markersLayer = new OpenLayers.Layer.Markers("Markers");
   map.addLayer(markersLayer);
-  var marker = new OpenLayers.Marker(map.getCenter());
-  markersLayer.addMarker(marker);
 
-  var infowindow = new OpenLayers.Popup.FramedCloud(
-    "infowindow", map.getCenter(), null,
-    '<div align="right"><b>القاهرة</b></div>', null, true, null);
-  infowindow.calculateRelativePosition = function () {
-    return 'tr';    // top & right
-  };
-  infowindow.hide();
-  map.addPopup(infowindow);
-
-  marker.events.register('click', this, function() {
-    // infowindow.moveTo(marker.lonlat);
-    infowindow.lonlat = marker.lonlat;
-    infowindow.show();
+  map.events.register('click', this, function(e) {
+    var lonlat = map.getLonLatFromViewPortPx(e.xy);
+    placeMarker(lonlat, map, markersLayer);
   });
+}
+
+function placeMarker(position, map, markersLayer) {
+  var marker = new OpenLayers.Marker(position);
+  markersLayer.addMarker(marker);
+  map.panTo(position);
 }
     </script>
   </head>

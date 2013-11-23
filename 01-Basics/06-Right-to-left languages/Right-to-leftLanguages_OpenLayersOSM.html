@@ -32,7 +32,7 @@ function initialize() {
   infowindow.hide();
   map.addPopup(infowindow);
 
-  marker.events.register('click', this, function(e) {
+  marker.events.register('click', this, function() {
     // infowindow.moveTo(marker.lonlat);
     infowindow.lonlat = marker.lonlat;
     infowindow.show();

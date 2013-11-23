@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Accessing arguments in UI events</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script>
+function initialize() {
+  var map = new OpenLayers.Map("map-canvas");
+  var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
+  map.addLayer(osmLayer);
+  var center = new OpenLayers.LonLat(131.044922, -25.363882)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  map.setCenter(center, 4);
+
+  var markersLayer = new OpenLayers.Layer.Markers("Markers");
+  map.addLayer(markersLayer);
+
+  map.events.register('click', this, function(e) {
+    var lonlat = map.getLonLatFromViewPortPx(e.xy);
+    placeMarker(lonlat, map, markersLayer);
+  });
+}
+
+function placeMarker(position, map, markersLayer) {
+  var marker = new OpenLayers.Marker(position);
+  markersLayer.addMarker(marker);
+  map.panTo(position);
+}
+    </script>
+  </head>
+  <body onload="initialize();">
+    <div id="map-canvas"></div>
+  </body>
+</html>

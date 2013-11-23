@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Using closures in event listeners</title>
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script>
+function initialize() {
+  var map = new OpenLayers.Map("map-canvas");
+  var osmLayer = new OpenLayers.Layer.OSM("OpenStreetMap");
+  map.addLayer(osmLayer);
+  var center = new OpenLayers.LonLat(131.044922, -25.363882)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  map.setCenter(center, 4);
+  var markersLayer = new OpenLayers.Layer.Markers("Markers");
+  map.addLayer(markersLayer);
+
+  // Add 5 markers to the map at random locations
+  var southWest = new OpenLayers.LonLat(125.244141, -31.203405)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+  var northEast = new OpenLayers.LonLat(131.044922, -25.363882)
+    .transform(
+      new OpenLayers.Projection("EPSG:4326"),     // WGS84
+      map.getProjectionObject()
+    );
+
+  var bounds = new OpenLayers.Bounds(southWest.lon, southWest.lat,
+                                     northEast.lon, northEast.lat);
+  map.zoomToExtent(bounds, false);
+
+  var lngSpan = northEast.lon - southWest.lon;
+  var latSpan = northEast.lat - southWest.lat;
+
+  for (var i = 0; i < 5; i++) {
+    var position = new OpenLayers.LonLat(
+        southWest.lon + lngSpan * Math.random(),
+        southWest.lat + latSpan * Math.random());
+    var marker = new OpenLayers.Marker(position);
+    markersLayer.addMarker(marker);
+
+    markerSetTitle(marker, (i + 1).toString(), map);
+    attachSecretMessage(marker, i, map);
+  }
+}
+
+function markerSetTitle(marker, title, map) {
+  var titlewindow = new OpenLayers.Popup(
+    "titlewindow", marker.lonlat, new OpenLayers.Size(24, 32),
+    title, null, false, null);
+  //titlewindow.autoSize = true;
+  map.addPopup(titlewindow);
+  titlewindow.hide();
+
+  marker.events.register('mouseover', this, function() {
+    titlewindow.show();
+  });
+  marker.events.register('mouseout', this, function() {
+    titlewindow.hide();
+  });
+}
+
+// The five markers show a secret message when clicked
+// but that message is not within the marker's instance data
+function attachSecretMessage(marker, num, map) {
+  var message = ['This', 'is', 'the', 'secret', 'message'];
+  var infowindow = new OpenLayers.Popup.FramedCloud(
+    "infowindow", marker.lonlat, null, message[num], null, true, null);
+  infowindow.calculateRelativePosition = function () {
+    return 'tr';    // top & right
+  };
+  infowindow.autoSize = true;
+  map.addPopup(infowindow);
+  infowindow.hide();
+
+  marker.events.register('click', this, function() {
+    infowindow.show();
+  });
+}
+    </script>
+  </head>
+  <body onload="initialize();">
+    <div id="map-canvas"></div>
+  </body>
+</html>
